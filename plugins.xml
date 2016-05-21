@@ -1,0 +1,10 @@
+<library path="libcsapex_navigation">
+<class type="csapex::GoTo" base_class_type="csapex::Node">
+  <description>Move the robot to a pose using path planning.</description>
+  <tags>Navigation</tags>
+</class>
+<class type="csapex::ApproachPose" base_class_type="csapex::Node">
+  <description>Move the robot to a pose reactively.</description>
+  <tags>Navigation, Control</tags>
+</class>
+</library>

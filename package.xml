@@ -1,0 +1,28 @@
+<?xml version="0.0"?>
+<package>
+  <name>csapex_navigation</name>
+  <version>0.0.0</version>
+  <description>The csapex_navigation package</description>
+
+  <maintainer email="sebastian.buck@uni-tuebingen.de">buck</maintainer>
+
+  <license>BSD</license>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>csapex_ros</build_depend>
+  <build_depend>csapex_transform</build_depend>
+  <build_depend>csapex</build_depend>
+  <build_depend>roscpp</build_depend>
+
+  <run_depend>csapex_ros</run_depend>
+  <run_depend>csapex_transform</run_depend>
+  <run_depend>csapex</run_depend>
+  <run_depend>roscpp</run_depend>
+
+
+  <export>
+  <csapex plugin="${prefix}/plugins.xml" />
+  </export>
+</package>
