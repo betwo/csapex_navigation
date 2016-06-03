@@ -1,5 +1,5 @@
 /// COMPONENT
-#include <csapex/model/node.h>
+#include <csapex_ros/ros_node.h>
 #include <csapex/msg/io.h>
 #include <csapex/param/parameter_factory.h>
 #include <csapex/model/node_modifier.h>
@@ -24,17 +24,18 @@ using namespace csapex::connection_types;
 namespace csapex
 {
 
-class GoTo : public Node
+class GoTo : public RosNode
 {
 public:
     GoTo()
-        : client_("navigate_to_goal", true),
-          cmd_sent_(false)
+        : cmd_sent_(false)
     {
     }
 
     void setup(csapex::NodeModifier& modifier) override
     {
+        RosNode::setup(modifier);
+
         event_at_goal_ = modifier.addEvent("at goal");
         event_error_ = modifier.addEvent("error");
 
@@ -43,12 +44,14 @@ public:
                 return;
             }
 
+            getRosHandler().waitForConnection();
+
             goal_ = std::dynamic_pointer_cast<TransformMessage const>(token->getTokenData());
             apex_assert(goal_);
 
-            if(!client_.isServerConnected()) {
+            if(!client_->isServerConnected()) {
                 awarn << "waiting for navigation server" << std::endl;
-                client_.waitForServer();
+                client_->waitForServer();
             }
 
             path_msgs::NavigateToGoalGoal goal_msg;
@@ -62,13 +65,18 @@ public:
             goal_msg.velocity = 0.5;
 
             ainfo << "sending goal " << goal_msg << std::endl;
-            client_.sendGoal(goal_msg,
+            client_->sendGoal(goal_msg,
                              boost::bind(&GoTo::goalCallback, this, _1, _2),
                              boost::bind(&GoTo::activeCallback, this),
                              boost::bind(&GoTo::feedbackCallback, this, _1));
 
             cmd_sent_ = true;
         });
+    }
+
+    void setupROS()
+    {
+        client_ = std::make_shared<actionlib::SimpleActionClient<path_msgs::NavigateToGoalAction>>("navigate_to_goal", true);
     }
 
     void activation()
@@ -105,10 +113,9 @@ public:
     {
     }
 
-    void process()
+    void processROS()
     {
     }
-
 
 
 private:
@@ -117,7 +124,7 @@ private:
 
     TransformMessage::ConstPtr goal_;
 
-    actionlib::SimpleActionClient<path_msgs::NavigateToGoalAction> client_;
+    std::shared_ptr<actionlib::SimpleActionClient<path_msgs::NavigateToGoalAction>> client_;
 
     bool cmd_sent_;
 };
