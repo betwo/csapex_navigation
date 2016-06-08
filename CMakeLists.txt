@@ -22,6 +22,7 @@ include_directories(
 add_library(csapex_navigation
   src/goto.cpp
   src/approach_pose.cpp
+  src/backup.cpp
 )
 target_link_libraries(csapex_navigation
   ${catkin_LIBRARIES}

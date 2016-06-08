@@ -27,6 +27,7 @@ class ApproachPose : public Node
 {
 public:
     ApproachPose()
+        : has_last_goal_(false)
     {
     }
 
@@ -41,8 +42,18 @@ public:
         event_error_ = modifier.addEvent("error");
 
         modifier.addTypedSlot<TransformMessage>("odom pose", [this](const TokenPtr& token) {
-            goal_ = std::dynamic_pointer_cast<TransformMessage const>(token->getTokenData());
-            apex_assert(goal_);
+            TransformMessage::ConstPtr new_goal_ = std::dynamic_pointer_cast<TransformMessage const>(token->getTokenData());
+            apex_assert(new_goal_);
+
+            if(has_last_goal_) {
+                double distance_to_last = new_goal_->value.getOrigin().distance(last_goal_.getOrigin());
+                if(distance_to_last > 1.0) {
+                    return;
+                }
+            }
+
+            goal_ = new_goal_;
+
         });
 
 
@@ -63,6 +74,17 @@ public:
     void setupParameters(csapex::Parameterizable& parameters) override
     {
         parameters.addParameter(param::ParameterFactory::declareRange("distance", -2.0, 2.0, 0.0, 0.01), distance_);
+
+        parameters.addParameter(param::ParameterFactory::declareRange("min_distance_to_robot", 0.1, 1.0, 0.4, 0.01), min_distance_to_robot_);
+        parameters.addParameter(param::ParameterFactory::declareRange("min_distance", 0.0, 3.0, 1.5, 0.01), min_offset_distance_);
+
+        parameters.addParameter(param::ParameterFactory::declareRange("speed/min", 0.0, 1.0, 0.15, 0.01), min_speed_);
+        parameters.addParameter(param::ParameterFactory::declareRange("speed/max", 0.0, 1.0, 0.3, 0.01), max_speed_);
+
+        parameters.addParameter(param::ParameterFactory::declareRange("error/okay", 0.0, 1.0, 0.07, 0.01), error_okay_);
+        parameters.addParameter(param::ParameterFactory::declareRange("error/max", 0.0, 1.0, 0.15, 0.01), error_max_);
+
+        parameters.addParameter(param::ParameterFactory::declareRange("steer/max", 0.0, M_PI/2, M_PI/8, 0.001), max_psi_);
     }
 
     void process()
@@ -75,25 +97,25 @@ public:
         pose_ = msg::getMessage<TransformMessage>(in_pose_);
 
         tf::Pose pose_object_odom = goal_->value;
+        last_goal_ = pose_object_odom;
+        has_last_goal_= true;
+
 
         tf::Transform odom_to_base_link = pose_->value;
         tf::Pose pose_object_base_link = odom_to_base_link * pose_object_odom;
 
         // offset_moves
         double offset_distance = distance_;
-        double min_offset_distance = -1.5;
-
-        double min_distance_to_robot = 0.4;
 
 
         tf::Transform goal_offset(tf::createIdentityQuaternion(), tf::Vector3(distance_, 0, 0));
         tf::Pose goal_error = pose_object_base_link * goal_offset;
 
         tf::Pose error = goal_error;
-        while(offset_distance > min_offset_distance) {
+        while(offset_distance > -min_offset_distance_) {
             tf::Transform offset(tf::createIdentityQuaternion(), tf::Vector3(offset_distance, 0, 0));
             error = pose_object_base_link * offset;
-            if(error.getOrigin().length() < min_distance_to_robot) {
+            if(error.getOrigin().length() < min_distance_to_robot_) {
                 break;
             }
 
@@ -146,9 +168,13 @@ public:
         double e = std::hypot(error.getOrigin().x(), error.getOrigin().y());
         double ge = std::hypot(goal_error.getOrigin().x(), goal_error.getOrigin().y());
 
-        bool pos_good = ge < 0.01 || (ge < 0.07 && ge > last_error_pos_);
+        bool pos_good = ge < error_okay_ || (e < error_max_ && e > last_error_pos_);
 
         double error_yaw = std::atan2(error.getOrigin().y(), error.getOrigin().x());
+
+        if(std::abs(error.getOrigin().y()) < 0.1) {
+            error_yaw = tf::getYaw(error.getRotation());
+        }
 
         if(std::abs(ge) < 0.05) {
             error_yaw = 0;
@@ -157,23 +183,33 @@ public:
         if(pos_good) {
             event_at_goal_->trigger();
 
+            has_last_goal_ = false;
+
         } else {
             double ex = error.getOrigin().x() ;
             double ey = error.getOrigin().y();
             twist.linear.x = ex * 0.6;
             double speed = std::abs(twist.linear.x);
 
-            double max_speed = 0.3;
-            double min_speed = 0.15;
+            double max_psi = max_psi_ * (1 + ge / 2.0);
 
-            if(speed > max_speed) {
-                twist.linear.x *= max_speed / speed;
-                twist.linear.y *= max_speed / speed;
-            } else if(speed < min_speed) {
-                twist.linear.x *= min_speed / speed;
-                twist.linear.y *= min_speed / speed;
+            if(speed > max_speed_) {
+                twist.linear.x *= max_speed_ / speed;
+                twist.linear.y *= max_speed_ / speed;
+            } else if(speed < min_speed_) {
+                twist.linear.x *= min_speed_ / speed;
+                twist.linear.y *= min_speed_ / speed;
             }
-            twist.angular.z =  error_yaw * 1.25;
+
+//            double psi = std::pow(1.75 * error_yaw, 2) * (error_yaw >= 0 ? 1.0 : -1.0);
+            double psi = error_yaw;
+
+
+            if(std::abs(psi) > max_psi) {
+                psi = psi / std::abs(psi) * max_psi;
+            }
+
+            twist.angular.z = psi;
         }
 
         last_error_pos_ = ge;
@@ -213,8 +249,22 @@ private:
     TransformMessage::ConstPtr pose_;
     TransformMessage::ConstPtr goal_;
 
+    bool has_last_goal_;
+    tf::Pose last_goal_;
+
     double distance_;
     double last_error_pos_;
+
+    double error_max_;
+    double error_okay_;
+
+    double min_distance_to_robot_;
+    double min_offset_distance_;
+
+    double max_speed_;
+    double min_speed_;
+
+    double max_psi_;
 };
 
 }
