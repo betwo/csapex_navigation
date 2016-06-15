@@ -9,19 +9,21 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES csapex_navigation
 #  CATKIN_DEPENDS csaoex_transform csapex roscpp
 #  DEPENDS system_lib
 )
 
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
 add_library(csapex_navigation
   src/goto.cpp
   src/approach_pose.cpp
+  src/approach_pose_trailer.cpp
   src/backup.cpp
 )
 target_link_libraries(csapex_navigation
