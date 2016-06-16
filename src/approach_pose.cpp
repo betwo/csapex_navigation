@@ -187,7 +187,7 @@ public:
 
         } else {
             double ex = error.getOrigin().x() ;
-            double ey = error.getOrigin().y();
+//            double ey = error.getOrigin().y();
             twist.linear.x = ex * 0.6;
             double speed = std::abs(twist.linear.x);
 
