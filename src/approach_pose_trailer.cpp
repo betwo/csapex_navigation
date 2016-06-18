@@ -268,9 +268,7 @@ public:
         geometry_msgs::Twist twist;
         //    double error_yaw = tf::getYaw(error.getRotation());
 
-        double e = std::hypot(error.getOrigin().x(), error.getOrigin().y());
-
-        bool pos_good = goal_ex < error_okay_ || goal_ex < error_max_ && goal_ex > last_error_pos_;
+        bool pos_good = goal_ex < error_okay_ || (goal_ex < error_max_ && goal_ex > last_error_pos_);
         last_error_pos_ = goal_ex;
 
         double error_yaw;
