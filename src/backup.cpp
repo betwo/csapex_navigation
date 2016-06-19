@@ -81,7 +81,9 @@ public:
 
         double error = distance_ - distance;
 
-        bool pos_good = std::abs(error) < 0.01 || (std::abs(distance) > std::abs(distance_));
+        bool overshoot = distance_ > 0.0 ? (distance > distance_) : (distance < distance_);
+
+        bool pos_good = std::abs(error) < 0.01 || overshoot;
 
 
         if(pos_good) {

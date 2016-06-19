@@ -32,6 +32,12 @@ public:
     {
     }
 
+    void setupParameters(csapex::Parameterizable& parameters) override
+    {
+        parameters.addParameter(param::ParameterFactory::declareText("algorithm", "patsy_forward"), algorithm_);
+        parameters.addParameter(param::ParameterFactory::declareText("channel", "plan_path"), channel_);
+    }
+
     void setup(csapex::NodeModifier& modifier) override
     {
         RosNode::setup(modifier);
@@ -59,7 +65,8 @@ public:
             tf::poseTFToMsg(goal_->value, goal_msg.goal.pose.pose);
             goal_msg.goal.pose.header.frame_id = goal_->frame_id;
             goal_msg.goal.pose.header.stamp.fromNSec(goal_->stamp_micro_seconds * 1e3);
-            goal_msg.goal.algorithm.data = "patsy_forward";
+            goal_msg.goal.algorithm.data = algorithm_;
+            goal_msg.goal.channel.data = channel_;
 
             goal_msg.failure_mode = path_msgs::NavigateToGoalGoal::FAILURE_MODE_REPLAN;
             goal_msg.velocity = 0.5;
@@ -92,6 +99,12 @@ public:
     {
         goal_.reset();
 
+        if(!result) {
+            aerr << "Received an empty result message. Did the action server crash?" << std::endl;
+            event_error_->trigger();
+            return;
+        }
+
         if(result->status == path_msgs::NavigateToGoalResult::STATUS_SUCCESS) {
             event_at_goal_->trigger();
         } else {
@@ -109,10 +122,6 @@ public:
 
     }
 
-    void setupParameters(csapex::Parameterizable& parameters) override
-    {
-    }
-
     void processROS()
     {
     }
@@ -123,6 +132,9 @@ private:
     Event* event_error_;
 
     TransformMessage::ConstPtr goal_;
+
+    std::string algorithm_;
+    std::string channel_;
 
     std::shared_ptr<actionlib::SimpleActionClient<path_msgs::NavigateToGoalAction>> client_;
 
