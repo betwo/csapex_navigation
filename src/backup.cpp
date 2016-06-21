@@ -76,6 +76,9 @@ public:
         tf::Transform delta = start_pose_.inverse() * pose;
 
         double distance = delta.getOrigin().length();
+        if(distance_ < 0) {
+            distance *= -1.0;
+        }
 
         geometry_msgs::Twist twist;
 
