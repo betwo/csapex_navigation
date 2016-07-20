@@ -47,7 +47,7 @@ public:
 
             if(has_last_goal_) {
                 double distance_to_last = new_goal_->value.getOrigin().distance(last_goal_.getOrigin());
-                if(distance_to_last > 1.0) {
+                if(distance_to_last > allowed_variation_) {
                     return;
                 }
             }
@@ -80,6 +80,8 @@ public:
 
         parameters.addParameter(param::ParameterFactory::declareRange("speed/min", 0.0, 1.0, 0.15, 0.01), min_speed_);
         parameters.addParameter(param::ParameterFactory::declareRange("speed/max", 0.0, 1.0, 0.3, 0.01), max_speed_);
+
+        parameters.addParameter(param::ParameterFactory::declareRange("allowed_variation", 0.0, 1.0, 0.5, 0.01), allowed_variation_);
 
         parameters.addParameter(param::ParameterFactory::declareRange("error/okay", 0.0, 1.0, 0.07, 0.01), error_okay_);
         parameters.addParameter(param::ParameterFactory::declareRange("error/max", 0.0, 1.0, 0.15, 0.01), error_max_);
@@ -265,6 +267,8 @@ private:
     double min_speed_;
 
     double max_psi_;
+
+    double allowed_variation_;
 };
 
 }
