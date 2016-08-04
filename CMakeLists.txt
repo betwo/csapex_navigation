@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   csapex_transform
   csapex
   roscpp
+  path_msgs
 )
 
 catkin_package(
@@ -30,4 +31,4 @@ target_link_libraries(csapex_navigation
   ${catkin_LIBRARIES}
   ${APEX_LIBS}
 )
-
+add_dependencies(csapex_navigation ${catkin_EXPORTED_TARGETS})
