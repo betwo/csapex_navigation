@@ -34,6 +34,18 @@ public:
 
     void setupParameters(csapex::Parameterizable& parameters) override
     {
+        std::map<std::string, int> init_modes = {
+            {"STOP", (int) path_msgs::NavigateToGoalGoal::INIT_MODE_STOP},
+            {"CONTINUE", (int) path_msgs::NavigateToGoalGoal::INIT_MODE_CONTINUE}
+        };
+        parameters.addParameter(param::ParameterFactory::declareParameterSet("init_mode", init_modes, 0), init_mode_);
+
+        std::map<std::string, int> failure_modes = {
+            {"ABORT", (int) path_msgs::NavigateToGoalGoal::FAILURE_MODE_ABORT},
+            {"REPLAN", (int) path_msgs::NavigateToGoalGoal::FAILURE_MODE_REPLAN}
+        };
+        parameters.addParameter(param::ParameterFactory::declareParameterSet("failure_mode", failure_modes, 0), failure_mode_);
+
         parameters.addParameter(param::ParameterFactory::declareText("algorithm", "patsy_forward"), algorithm_);
         parameters.addParameter(param::ParameterFactory::declareText("channel", "plan_path"), channel_);
     }
@@ -68,7 +80,9 @@ public:
             goal_msg.goal.algorithm.data = algorithm_;
             goal_msg.goal.channel.data = channel_;
 
-            goal_msg.failure_mode = path_msgs::NavigateToGoalGoal::FAILURE_MODE_REPLAN;
+            goal_msg.init_mode = init_mode_;
+            goal_msg.failure_mode = failure_mode_;
+
             goal_msg.velocity = 0.5;
 
             ainfo << "sending goal " << goal_msg << std::endl;
@@ -135,6 +149,9 @@ private:
 
     std::string algorithm_;
     std::string channel_;
+
+    int init_mode_;
+    int failure_mode_;
 
     std::shared_ptr<actionlib::SimpleActionClient<path_msgs::NavigateToGoalAction>> client_;
 
