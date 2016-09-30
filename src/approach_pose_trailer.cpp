@@ -255,17 +255,17 @@ public:
         tf::Transform goal_to_base_link = base_link_to_goal.inverse();
         double goal_ex = std::abs(goal_to_base_link.getOrigin().x());
 
-        tf::Transform trailer_goal_t_trailer_back = trailer_back_to_trailer_goal.inverse();
+//        tf::Transform trailer_goal_t_trailer_back = trailer_back_to_trailer_goal.inverse();
 
-        bool position_trailer = goal_ex > trailer_length_ && std::abs(trailer_goal_t_trailer_back.getOrigin().y()) > trailer_length_ * 0.2;
+//        bool position_trailer = goal_ex > trailer_length_ && std::abs(trailer_goal_t_trailer_back.getOrigin().y()) > trailer_length_ * 0.2;
 
-        if(position_trailer) {
-            error = trailer_back_to_trailer_goal;
-            double error_yaw = std::atan2(error.getOrigin().y(), error.getOrigin().x());
-            ainfo << "trailer error yaw: " << error_yaw << std::endl;
-        } else {
+//        if(position_trailer) {
+//            error = trailer_back_to_trailer_goal;
+//            double error_yaw = std::atan2(error.getOrigin().y(), error.getOrigin().x());
+//            ainfo << "trailer error yaw: " << error_yaw << std::endl;
+//        } else {
             error = base_link_to_base_goal;
-        }
+//        }
 
         geometry_msgs::Twist twist;
         //    double error_yaw = tf::getYaw(error.getRotation());
@@ -275,22 +275,18 @@ public:
 
         double error_yaw;
         if(goal_ex  >= min_offset_distance_) {
-            error_yaw = std::atan2(error.getOrigin().y(), error.getOrigin().x());
-            if(!position_trailer) {
-                error_yaw *= 1.5;
-            } else {
-                double tey = trailer_goal_t_trailer_back.getOrigin().y();
-                if(std::abs(tey) > trailer_length_ / 2.0) {
-                    error_yaw = 2.0 * std::atan2(trailer_back_to_trailer_goal.getOrigin().y(), trailer_back_to_trailer_goal.getOrigin().x());
-                } else {
-                    error_yaw = 0.5 * tey;
-                }
-                ainfo << "trailer error: " << error_yaw << std::endl;
-            }
+            double ka = 0.75;
+            double kb = 1.0;
+
+            double f = std::min(trailer_length_ / 4.0, trailer_back_to_trailer_goal.getOrigin().length());
+
+            error_yaw = ka * (1-f) * std::atan2(error.getOrigin().y(), error.getOrigin().x()) + kb * f * std::atan2(trailer_back_to_trailer_goal.getOrigin().y(), trailer_back_to_trailer_goal.getOrigin().x());
+
         } else {
             ainfo << "ey: " << goal_to_base_link.getOrigin().y() << std::endl;
             error_yaw = 4.0 * goal_to_base_link.getOrigin().y();
         }
+        ainfo << "trailer error: " << error_yaw << std::endl;
 
         if(pos_good) {
             event_at_goal_->trigger();
