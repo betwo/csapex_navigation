@@ -1,4 +1,28 @@
+<library path="libcsapex_navigation_core">
+<class type="csapex::StopMovement" base_class_type="csapex::Node">
+  <description>Stops the robot completely</description>
+</class>
+<class type="csapex::FollowPath" base_class_type="csapex::Node">
+  <description>Follows a given path</description>
+</class>
+<class type="csapex::RegisterNavigation" base_class_type="csapex::CorePlugin">
+  <description></description>
+</class>
+</library>
+
 <library path="libcsapex_navigation">
+<class type="csapex::StopMovement" base_class_type="csapex::Node">
+  <description>Stops the robot completely</description>
+</class>
+<class type="csapex::FollowPath" base_class_type="csapex::Node">
+  <description>Follows a given path</description>
+</class>
+<class type="csapex::PlanPath" base_class_type="csapex::Node">
+  <description>Plans a path using a goal pose as target condition</description>
+</class>
+<class type="csapex::PlanPathWithMap" base_class_type="csapex::Node">
+  <description>Plans a path using a map as target condition</description>
+</class>
 <class type="csapex::GoTo" base_class_type="csapex::Node">
   <description>Move the robot to a pose using path planning.</description>
   <tags>Navigation</tags>

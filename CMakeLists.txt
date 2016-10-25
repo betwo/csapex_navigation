@@ -22,6 +22,10 @@ include_directories(
 )
 
 add_library(csapex_navigation
+  src/stop_movement.cpp
+  src/follow_path.cpp
+  src/plan_path.cpp
+  src/plan_path_with_map.cpp
   src/goto.cpp
   src/approach_pose.cpp
   src/approach_pose_trailer.cpp
@@ -32,3 +36,13 @@ target_link_libraries(csapex_navigation
   ${APEX_LIBS}
 )
 add_dependencies(csapex_navigation ${catkin_EXPORTED_TARGETS})
+
+
+add_library(csapex_navigation_core
+  src/register_navigation.cpp
+)
+target_link_libraries(csapex_navigation_core
+  ${catkin_LIBRARIES}
+  ${APEX_LIBS}
+)
+add_dependencies(csapex_navigation_core ${catkin_EXPORTED_TARGETS})
