@@ -7,6 +7,12 @@
 #include <csapex/utility/register_apex_plugin.h>
 #include <csapex/msg/generic_value_message.hpp>
 
+/// PROJECT
+#include <path_msgs/FollowPathAction.h>
+
+/// SYSTEM
+#include <actionlib/client/simple_action_client.h>
+
 using namespace csapex;
 using namespace csapex::connection_types;
 
@@ -23,8 +29,8 @@ public:
 
     void setup(csapex::NodeModifier& modifier) override
     {
-        in_ = modifier.addInput<std::string>("Input");
-        out_ = modifier.addOutput<std::string>("Output");
+        slot_ = modifier.addSlot("stop", [this]() {
+        });
     }
 
     void setupParameters(csapex::Parameterizable& params) override
@@ -33,16 +39,10 @@ public:
 
     void process() override
     {
-        std::string value = msg::getValue<std::string>(in_);
-
-        MessageConstPtr message = msg::getMessage<GenericValueMessage<std::string>>(in_);
-        apex_assert(message);
-        msg::publish(out_, value + "!");
     }
 
 private:
-    Input* in_;
-    Output* out_;
+    Slot* slot_;
 
 };
 

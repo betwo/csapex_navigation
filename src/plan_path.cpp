@@ -65,7 +65,7 @@ public:
 
     void setupROS()
     {
-        getRosHandler().registerShutdownCallback([this](){
+        connection_ = getRosHandler().shutdown.connect([this](){
             tearDown();
         });
 
@@ -206,6 +206,8 @@ private:
     Continuation continuation_;
 
     ros::Publisher debug_pub;
+
+    slim_signal::ScopedConnection connection_;
 };
 
 }

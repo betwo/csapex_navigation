@@ -68,7 +68,7 @@ public:
 
     void setupROS()
     {
-        getRosHandler().registerShutdownCallback([this](){
+        connection_ = getRosHandler().shutdown.connect([this](){
             tearDown();
         });
     }
@@ -230,6 +230,8 @@ private:
     std::map<std::string, std::shared_ptr<actionlib::SimpleActionClient<path_msgs::PlanPathAction>>> clients_;
 
     Continuation continuation_;
+
+    slim_signal::ScopedConnection connection_;
 };
 
 }
