@@ -58,7 +58,7 @@ public:
         event_error_ = modifier.addEvent("error");
 
         modifier.addTypedSlot<TransformMessage>("goto", [this](const TokenPtr& token) {
-            if(cmd_sent_ || !token->isActive()) {
+            if(cmd_sent_ || token->getActivityModifier() != ActivityModifier::ACTIVATE) {
                 return;
             }
 
