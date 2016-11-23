@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES csapex_navigation
+#  LIBRARIES ${PROJECT_NAME}
 #  CATKIN_DEPENDS csaoex_transform csapex roscpp
 #  DEPENDS system_lib
 )
@@ -21,7 +21,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(csapex_navigation
+add_library(${PROJECT_NAME}
   src/stop_movement.cpp
   src/follow_path.cpp
   src/plan_path.cpp
@@ -31,18 +31,31 @@ add_library(csapex_navigation
   src/approach_pose_trailer.cpp
   src/backup.cpp
 )
-target_link_libraries(csapex_navigation
+target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${APEX_LIBS}
 )
-add_dependencies(csapex_navigation ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 
 
-add_library(csapex_navigation_core
+add_library(${PROJECT_NAME}_core
   src/register_navigation.cpp
 )
-target_link_libraries(csapex_navigation_core
+target_link_libraries(${PROJECT_NAME}_core
   ${catkin_LIBRARIES}
   ${APEX_LIBS}
 )
-add_dependencies(csapex_navigation_core ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_core ${catkin_EXPORTED_TARGETS})
+
+
+#
+# INSTALL
+#
+
+install(FILES plugins.xml
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_core
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
