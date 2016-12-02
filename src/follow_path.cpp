@@ -55,6 +55,7 @@ public:
         parameters.addParameter(param::ParameterFactory::declareRange("target_velocity", 0.0, 5.0, 1.0, 0.01), velocity_);
 
         parameters.addParameter(param::ParameterFactory::declareText("follower_topic", "follow_path"), channel_);
+        parameters.addParameter(param::ParameterFactory::declareText("follower_algorithm", ""), algorithm_);
     }
 
     void setup(csapex::NodeModifier& modifier) override
@@ -92,6 +93,8 @@ public:
 
             client.reset();
             continuation_([](csapex::NodeModifier& node_modifier, Parameterizable &parameters){});
+
+            event_done_->trigger();
         }
     }
 
@@ -155,6 +158,7 @@ public:
         goal_msg.init_mode = init_mode_;
         goal_msg.velocity = velocity_;
         goal_msg.path = *path;
+        goal_msg.following_algorithm.data = algorithm_;
 
 //        ainfo << "sending goal " << goal_msg << std::endl;
         client->sendGoal(goal_msg,
@@ -171,6 +175,7 @@ private:
     Event* event_error_;
 
     std::string channel_;
+    std::string algorithm_;
 
     int init_mode_;
     double velocity_;

@@ -46,8 +46,10 @@ public:
         };
         parameters.addParameter(param::ParameterFactory::declareParameterSet("failure_mode", failure_modes, 0), failure_mode_);
 
-        parameters.addParameter(param::ParameterFactory::declareText("algorithm", "patsy_forward"), algorithm_);
-        parameters.addParameter(param::ParameterFactory::declareText("channel", "plan_path"), channel_);
+        parameters.addParameter(param::ParameterFactory::declareText("algorithm", "patsy_forward"), planning_algorithm_);
+        parameters.addParameter(param::ParameterFactory::declareText("channel", "plan_path"), planning_channel_);
+
+        parameters.addParameter(param::ParameterFactory::declareText("following_algorithm", ""), following_algorithm_);
     }
 
     void setup(csapex::NodeModifier& modifier) override
@@ -77,8 +79,9 @@ public:
             tf::poseTFToMsg(goal_->value, goal_msg.goal.pose.pose);
             goal_msg.goal.pose.header.frame_id = goal_->frame_id;
             goal_msg.goal.pose.header.stamp.fromNSec(goal_->stamp_micro_seconds * 1e3);
-            goal_msg.goal.algorithm.data = algorithm_;
-            goal_msg.goal.channel.data = channel_;
+            goal_msg.goal.planning_algorithm.data = planning_algorithm_;
+            goal_msg.goal.following_algorithm.data = following_algorithm_;
+            goal_msg.goal.planning_channel.data = planning_channel_;
 
             goal_msg.init_mode = init_mode_;
             goal_msg.failure_mode = failure_mode_;
@@ -147,8 +150,9 @@ private:
 
     TransformMessage::ConstPtr goal_;
 
-    std::string algorithm_;
-    std::string channel_;
+    std::string planning_algorithm_;
+    std::string planning_channel_;
+    std::string following_algorithm_;
 
     int init_mode_;
     int failure_mode_;

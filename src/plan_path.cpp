@@ -154,8 +154,8 @@ public:
 
         goal_msg.goal.pose.header.frame_id = goal_->frame_id;
         goal_msg.goal.pose.header.stamp.fromNSec(goal_->stamp_micro_seconds * 1e3);
-        goal_msg.goal.algorithm.data = algorithm_;
-        goal_msg.goal.channel.data = channel_;
+        goal_msg.goal.planning_algorithm.data = algorithm_;
+        goal_msg.goal.planning_channel.data = channel_;
         goal_msg.goal.grow_obstacles = grow_obstacles_;
         if(grow_obstacles_) {
             goal_msg.goal.obstacle_growth_radius = obstacle_growth_;

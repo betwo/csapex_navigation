@@ -180,8 +180,8 @@ public:
 
         goal_msg.goal.min_dist = min_dist_;
         goal_msg.goal.pose.header = goal_->header;
-        goal_msg.goal.algorithm.data = algorithm_;
-        goal_msg.goal.channel.data = channel_;
+        goal_msg.goal.planning_algorithm.data = algorithm_;
+        goal_msg.goal.planning_channel.data = channel_;
 
         goal_msg.goal.grow_obstacles = grow_obstacles_;
         if(grow_obstacles_) {
