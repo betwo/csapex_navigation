@@ -22,6 +22,9 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
+  src/set_lookat_point.cpp
+  src/select_closest_pose.cpp
+  src/move_robot.cpp
   src/stop_movement.cpp
   src/follow_path.cpp
   src/plan_path.cpp

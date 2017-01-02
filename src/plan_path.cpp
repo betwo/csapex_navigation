@@ -143,7 +143,7 @@ public:
         if(!client->isServerConnected()) {
             awarn << "waiting for path planner server " << channel_ << std::endl;
             if(!client->waitForServer(ros::Duration(1.0))) {
-                throw std::runtime_error("unknown path planning channel");
+                throw std::runtime_error(std::string("unknown path planning channel ") + channel_);
             }
         }
 

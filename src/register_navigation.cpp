@@ -10,6 +10,8 @@
 #include <path_msgs/PathSequence.h>
 #include <path_msgs/DirectionalPath.h>
 #include <nav_msgs/OccupancyGrid.h>
+#include <geometry_msgs/PoseArray.h>
+#include <visualization_msgs/MarkerArray.h>
 
 namespace csapex {
 
@@ -25,6 +27,9 @@ public:
         connection_types::MessageConversionHook<connection_types::GenericPointerMessage, nav_msgs::OccupancyGrid>::registerConversion();
         connection_types::MessageConversionHook<connection_types::GenericPointerMessage, path_msgs::DirectionalPath>::registerConversion();
         connection_types::MessageConversionHook<connection_types::GenericPointerMessage, path_msgs::PathSequence>::registerConversion();
+
+        connection_types::MessageConversionHook<connection_types::GenericPointerMessage, geometry_msgs::PoseArray>::registerConversion();
+        connection_types::MessageConversionHook<connection_types::GenericPointerMessage, visualization_msgs::MarkerArray>::registerConversion();
     }
 
     void shutdown()

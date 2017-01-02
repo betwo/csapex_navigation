@@ -1,4 +1,13 @@
 <library path="libcsapex_navigation_core">
+<class type="csapex::SetLookatPoint" base_class_type="csapex::Node">
+  <description>Sets the point for an omnidrive to look at</description>
+</class>
+<class type="csapex::SelectClosestPose" base_class_type="csapex::Node">
+  <description>Finds the nearest pose in a pose array</description>
+</class>
+<class type="csapex::MoveRobot" base_class_type="csapex::Node">
+  <description>Moves the robot without feedback.</description>
+</class>
 <class type="csapex::StopMovement" base_class_type="csapex::Node">
   <description>Stops the robot completely</description>
 </class>
@@ -11,6 +20,15 @@
 </library>
 
 <library path="libcsapex_navigation">
+<class type="csapex::SetLookatPoint" base_class_type="csapex::Node">
+  <description>Sets the point for an omnidrive to look at</description>
+</class>
+<class type="csapex::SelectClosestPose" base_class_type="csapex::Node">
+  <description>Finds the nearest pose in a pose array</description>
+</class>
+<class type="csapex::MoveRobot" base_class_type="csapex::Node">
+  <description>Moves the robot without feedback.</description>
+</class>
 <class type="csapex::StopMovement" base_class_type="csapex::Node">
   <description>Stops the robot completely</description>
 </class>
