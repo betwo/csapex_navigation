@@ -55,7 +55,10 @@ public:
         parameters.addParameter(param::ParameterFactory::declareRange("target_velocity", 0.0, 5.0, 1.0, 0.01), velocity_);
 
         parameters.addParameter(param::ParameterFactory::declareText("follower_topic", "follow_path"), channel_);
-        parameters.addParameter(param::ParameterFactory::declareText("follower_algorithm", ""), algorithm_);
+
+        parameters.addParameter(param::ParameterFactory::declareText("robot_controller", ""), controller_);
+        parameters.addParameter(param::ParameterFactory::declareText("local_planner", ""), local_planner_);
+        parameters.addParameter(param::ParameterFactory::declareText("obstacle_avoider", ""), obstacle_avoider_);
     }
 
     void setup(csapex::NodeModifier& modifier) override
@@ -66,6 +69,9 @@ public:
 
         event_done_ = modifier.addEvent("done");
         event_error_ = modifier.addEvent("error");
+
+        event_obstacle_ = modifier.addEvent("obstacle");
+        event_no_local_path_ = modifier.addEvent("no local path");
     }
 
     void setupROS()
@@ -85,6 +91,7 @@ public:
             continuation_([](csapex::NodeModifier& node_modifier, Parameterizable &parameters){});
         }
     }
+
     void detach()
     {
         if(client) {
@@ -118,8 +125,16 @@ public:
         }
     }
 
-    void feedbackCallback(const path_msgs::FollowPathFeedbackConstPtr&)
+    void feedbackCallback(const path_msgs::FollowPathFeedbackConstPtr& feedback)
     {
+        switch(feedback->status) {
+        case path_msgs::FollowPathFeedback::MOTION_STATUS_MOVING:
+            break;
+        case path_msgs::FollowPathFeedback::MOTION_STATUS_OBSTACLE:
+            break;
+        case path_msgs::FollowPathFeedback::MOTION_STATUS_NO_LOCAL_PATH:
+            break;
+        }
 
     }
 
@@ -158,7 +173,9 @@ public:
         goal_msg.init_mode = init_mode_;
         goal_msg.velocity = velocity_;
         goal_msg.path = *path;
-        goal_msg.following_algorithm.data = algorithm_;
+        goal_msg.robot_controller.data = controller_;
+        goal_msg.local_planner.data = local_planner_;
+        goal_msg.obstacle_avoider.data = obstacle_avoider_;
 
 //        ainfo << "sending goal " << goal_msg << std::endl;
         client->sendGoal(goal_msg,
@@ -174,8 +191,13 @@ private:
     Event* event_done_;
     Event* event_error_;
 
+    Event* event_obstacle_;
+    Event* event_no_local_path_;
+
     std::string channel_;
-    std::string algorithm_;
+    std::string controller_;
+    std::string local_planner_;
+    std::string obstacle_avoider_;
 
     int init_mode_;
     double velocity_;
