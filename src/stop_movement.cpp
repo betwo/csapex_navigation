@@ -7,12 +7,6 @@
 #include <csapex/utility/register_apex_plugin.h>
 #include <csapex/msg/generic_value_message.hpp>
 
-/// PROJECT
-#include <path_msgs/FollowPathAction.h>
-
-/// SYSTEM
-#include <actionlib/client/simple_action_client.h>
-
 using namespace csapex;
 using namespace csapex::connection_types;
 

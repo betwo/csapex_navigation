@@ -1,15 +1,13 @@
 /// COMPONENT
-#include <csapex_ros/ros_node.h>
+#include <csapex_ros/actionlib_node.h>
 #include <csapex/msg/io.h>
 #include <csapex/param/parameter_factory.h>
 #include <csapex/model/node_modifier.h>
+#include <csapex/model/token.h>
 #include <csapex/utility/register_apex_plugin.h>
-#include <csapex/msg/io.h>
 #include <csapex_ros/yaml_io.hpp>
 #include <csapex/msg/generic_pointer_message.hpp>
 #include <csapex_ros/ros_message_conversion.h>
-#include <csapex/model/token.h>
-#include <csapex/signal/event.h>
 #include <csapex_transform/transform_message.h>
 
 /// PROJECT
@@ -17,14 +15,13 @@
 
 /// SYSTEM
 #include <tf/tf.h>
-#include <actionlib/client/simple_action_client.h>
 
 using namespace csapex::connection_types;
 
 namespace csapex
 {
 
-class GoTo : public RosNode
+class GoTo : public ActionlibNode<path_msgs::NavigateToGoalAction>
 {
 public:
     GoTo()
@@ -69,9 +66,9 @@ public:
             goal_ = std::dynamic_pointer_cast<TransformMessage const>(token->getTokenData());
             apex_assert(goal_);
 
-            if(!client_->isServerConnected()) {
+            if(!active_client_->isServerConnected()) {
                 awarn << "waiting for navigation server" << std::endl;
-                client_->waitForServer();
+                active_client_->waitForServer();
             }
 
             path_msgs::NavigateToGoalGoal goal_msg;
@@ -89,10 +86,7 @@ public:
             goal_msg.velocity = 0.5;
 
             ainfo << "sending goal " << goal_msg << std::endl;
-            client_->sendGoal(goal_msg,
-                             boost::bind(&GoTo::goalCallback, this, _1, _2),
-                             boost::bind(&GoTo::activeCallback, this),
-                             boost::bind(&GoTo::feedbackCallback, this, _1));
+            sendGoal(goal_msg);
 
             cmd_sent_ = true;
         });
@@ -100,7 +94,7 @@ public:
 
     void setupROS()
     {
-        client_ = std::make_shared<actionlib::SimpleActionClient<path_msgs::NavigateToGoalAction>>("navigate_to_goal", true);
+        setupClient("navigate_to_goal", true);
     }
 
     void activation()
@@ -112,41 +106,20 @@ public:
         cmd_sent_ = false;
     }
 
-    void goalCallback(const actionlib::SimpleClientGoalState&, const path_msgs::NavigateToGoalResultConstPtr& result)
+    virtual void processResultCallback(const actionlib::SimpleClientGoalState&, const path_msgs::NavigateToGoalResultConstPtr& result)
     {
         goal_.reset();
 
-        if(!result) {
-            aerr << "Received an empty result message. Did the action server crash?" << std::endl;
-            event_error_->trigger();
-            return;
-        }
-
         if(result->status == path_msgs::NavigateToGoalResult::STATUS_SUCCESS) {
-            event_at_goal_->trigger();
+            msg::trigger(event_at_goal_);
         } else {
-            event_error_->trigger();
+            msg::trigger(event_error_);
         }
-    }
-
-    void feedbackCallback(const path_msgs::NavigateToGoalFeedbackConstPtr&)
-    {
-
-    }
-
-    void activeCallback()
-    {
-
-    }
-
-    void processROS()
-    {
     }
 
 
 private:
     Event* event_at_goal_;
-    Event* event_error_;
 
     TransformMessage::ConstPtr goal_;
 
@@ -156,8 +129,6 @@ private:
 
     int init_mode_;
     int failure_mode_;
-
-    std::shared_ptr<actionlib::SimpleActionClient<path_msgs::NavigateToGoalAction>> client_;
 
     bool cmd_sent_;
 };

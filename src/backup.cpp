@@ -90,7 +90,7 @@ public:
 
 
         if(pos_good) {
-            event_at_goal_->trigger();
+            msg::trigger(event_at_goal_);
             twist.linear.x = 0.0;
 
         } else {

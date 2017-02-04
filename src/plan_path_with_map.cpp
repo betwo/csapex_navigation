@@ -1,15 +1,12 @@
 /// COMPONENT
-#include <csapex_ros/ros_node.h>
+#include <csapex_ros/actionlib_node.h>
 #include <csapex/msg/io.h>
 #include <csapex/param/parameter_factory.h>
 #include <csapex/model/node_modifier.h>
 #include <csapex/utility/register_apex_plugin.h>
-#include <csapex/msg/io.h>
 #include <csapex_ros/yaml_io.hpp>
 #include <csapex/msg/generic_pointer_message.hpp>
 #include <csapex_ros/ros_message_conversion.h>
-#include <csapex/model/token.h>
-#include <csapex/signal/event.h>
 #include <csapex_transform/transform_message.h>
 
 /// PROJECT
@@ -17,27 +14,23 @@
 
 /// SYSTEM
 #include <tf/tf.h>
-#include <actionlib/client/simple_action_client.h>
 
 using namespace csapex::connection_types;
 
 namespace csapex
 {
 
-class PlanPathWithMap : public RosNode
+class PlanPathWithMap : public ChanneledActionlibNode<path_msgs::PlanPathAction>
 {
 public:
     PlanPathWithMap()
     {
     }
 
-    bool isAsynchronous() const
-    {
-        return true;
-    }
-
     void setupParameters(csapex::Parameterizable& parameters) override
     {
+        ActionlibNode<path_msgs::PlanPathAction>::setupParameters(parameters);
+
         parameters.addParameter(param::ParameterFactory::declareTrigger("abort"), [this](param::Parameter*){
             tearDown();
         });
@@ -57,53 +50,27 @@ public:
 
     void setup(csapex::NodeModifier& modifier) override
     {
-        RosNode::setup(modifier);
+        ActionlibNode<path_msgs::PlanPathAction>::setupROS();
 
         in_goal_ = modifier.addInput<nav_msgs::OccupancyGrid>("Goal");
         in_pose_ = modifier.addOptionalInput<TransformMessage>("Start");
         out_path_ = modifier.addOutput<path_msgs::PathSequence>("Path");
-
-        event_error_ = modifier.addEvent("error");
     }
 
-    void setupROS()
+    void abortAction() override
     {
-        connection_ = getRosHandler().shutdown.connect([this](){
-            tearDown();
-        });
+        ActionlibNode<path_msgs::PlanPathAction>::abortAction();
+        setParameter("feedback", std::string("aborted"));
     }
 
-    void tearDown()
+
+    void processResultCallback(const actionlib::SimpleClientGoalState& state, const boost::shared_ptr<typename path_msgs::PlanPathResult const>& result) override
     {
-        if(client) {
-            aerr << "Aborting path planning" << std::endl;
-            client->cancelGoal();
-
-            client.reset();
-            continuation_([](csapex::NodeModifier& node_modifier, Parameterizable &parameters){});
-
-            setParameter("feedback", std::string("aborted"));
-        }
-    }
-
-    void goalCallback(const actionlib::SimpleClientGoalState&, const path_msgs::PlanPathResultConstPtr& result)
-    {
-        goal_.reset();
-
-        if(!result) {
-            aerr << "Received an empty result message. Did the action server crash?" << std::endl;
-            event_error_->trigger();
-
+        if(!result->path.paths.empty()) {
+            msg::publish(out_path_, std::make_shared<path_msgs::PathSequence>(result->path));
         } else {
-            if(!result->path.paths.empty()) {
-                msg::publish(out_path_, std::make_shared<path_msgs::PathSequence>(result->path));
-            } else {
-                event_error_->trigger();
-            }
+            msg::trigger(event_error_);
         }
-
-        client.reset();
-        continuation_([](csapex::NodeModifier& node_modifier, Parameterizable &parameters){});
     }
 
     void feedbackCallback(const path_msgs::PlanPathFeedbackConstPtr& fb)
@@ -133,30 +100,14 @@ public:
         setParameter("feedback", std::string("STATUS: ") + msg);
     }
 
-    void activeCallback()
+    std::string getChannel() const override
     {
-
-    }
-
-    void process(csapex::NodeModifier& node_modifier, csapex::Parameterizable& parameters,  Continuation continuation) override
-    {
-        continuation_ = continuation;
-
-        RosNode::process();
+        return channel_;
     }
 
 
-
-    void processROS()
+    void getGoal(path_msgs::PlanPathGoal& goal) override
     {
-        aerr << "start path planning" << std::endl;
-
-        auto pos = clients_.find(channel_);
-        if(pos == clients_.end()) {
-            clients_[channel_] = std::make_shared<actionlib::SimpleActionClient<path_msgs::PlanPathAction>>(channel_, true);
-        }
-        client = clients_.at(channel_);
-
         if(msg::hasMessage(in_pose_)) {
             start_ = msg::getMessage<TransformMessage>(in_pose_);
         } else {
@@ -166,42 +117,30 @@ public:
         goal_ = msg::getMessage<nav_msgs::OccupancyGrid>(in_goal_);
         apex_assert(goal_);
 
-        if(!client->isServerConnected()) {
-            awarn << "waiting for path planner server " << channel_ << std::endl;
-            if(!client->waitForServer(ros::Duration(1.0))) {
-                throw std::runtime_error("unknown path planning channel");
-            }
-        }
 
-        path_msgs::PlanPathGoal goal_msg;
-        goal_msg.goal.type = path_msgs::Goal::GOAL_TYPE_MAP;
+        goal.goal.type = path_msgs::Goal::GOAL_TYPE_MAP;
 
-        goal_msg.goal.map = *goal_;
+        goal.goal.map = *goal_;
 
-        goal_msg.goal.min_dist = min_dist_;
-        goal_msg.goal.pose.header = goal_->header;
-        goal_msg.goal.planning_algorithm.data = algorithm_;
-        goal_msg.goal.planning_channel.data = channel_;
+        goal.goal.min_dist = min_dist_;
+        goal.goal.pose.header = goal_->header;
+        goal.goal.planning_algorithm.data = algorithm_;
+        goal.goal.planning_channel.data = channel_;
 
-        goal_msg.goal.grow_obstacles = grow_obstacles_;
+        goal.goal.grow_obstacles = grow_obstacles_;
         if(grow_obstacles_) {
-            goal_msg.goal.obstacle_growth_radius = obstacle_growth_;
+            goal.goal.obstacle_growth_radius = obstacle_growth_;
         }
 
-        goal_msg.goal.max_search_duration = max_search_duration_;
+        goal.goal.max_search_duration = max_search_duration_;
 
         if(start_) {
-            goal_msg.use_start = true;
-            tf::poseTFToMsg(start_->value, goal_msg.start.pose);
+            goal.use_start = true;
+            tf::poseTFToMsg(start_->value, goal.start.pose);
 
         } else {
-            goal_msg.use_start = false;
+            goal.use_start = false;
         }
-
-        client->sendGoal(goal_msg,
-                         boost::bind(&PlanPathWithMap::goalCallback, this, _1, _2),
-                         boost::bind(&PlanPathWithMap::activeCallback, this),
-                         boost::bind(&PlanPathWithMap::feedbackCallback, this, _1));
     }
 
 
@@ -210,8 +149,6 @@ private:
     Input* in_pose_;
 
     Output* out_path_;
-
-    Event* event_error_;
 
     TransformMessage::ConstPtr start_;
     std::shared_ptr<nav_msgs::OccupancyGrid const> goal_;
@@ -225,13 +162,6 @@ private:
     double obstacle_growth_;
 
     double max_search_duration_;
-
-    std::shared_ptr<actionlib::SimpleActionClient<path_msgs::PlanPathAction>> client;
-    std::map<std::string, std::shared_ptr<actionlib::SimpleActionClient<path_msgs::PlanPathAction>>> clients_;
-
-    Continuation continuation_;
-
-    slim_signal::ScopedConnection connection_;
 };
 
 }

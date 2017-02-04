@@ -183,7 +183,7 @@ public:
         }
 
         if(pos_good) {
-            event_at_goal_->trigger();
+            msg::trigger(event_at_goal_);
 
             has_last_goal_ = false;
 
