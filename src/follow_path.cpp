@@ -43,7 +43,7 @@ public:
 
         parameters.addParameter(param::ParameterFactory::declareText("robot_controller", ""), controller_);
         parameters.addParameter(param::ParameterFactory::declareText("local_planner", ""), local_planner_);
-        parameters.addParameter(param::ParameterFactory::declareText("obstacle_avoider", ""), obstacle_avoider_);
+        parameters.addParameter(param::ParameterFactory::declareText("collision_avoider", ""), collision_avoider_);
     }
 
     void setup(csapex::NodeModifier& modifier) override
@@ -94,7 +94,7 @@ public:
         goal.path = *path;
         goal.robot_controller.data = controller_;
         goal.local_planner.data = local_planner_;
-        goal.obstacle_avoider.data = obstacle_avoider_;
+        goal.collision_avoider.data = collision_avoider_;
     }
 
 
@@ -107,7 +107,7 @@ private:
     std::string channel_;
     std::string controller_;
     std::string local_planner_;
-    std::string obstacle_avoider_;
+    std::string collision_avoider_;
 
     int init_mode_;
     double velocity_;
