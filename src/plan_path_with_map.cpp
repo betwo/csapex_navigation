@@ -31,19 +31,55 @@ public:
     {
         ActionlibNode<path_msgs::PlanPathAction>::setupParameters(parameters);
 
-        parameters.addParameter(param::ParameterFactory::declareTrigger("abort"), [this](param::Parameter*){
-            tearDown();
-        });
-
-        parameters.addParameter(param::ParameterFactory::declareText("algorithm", "patsy_forward"), algorithm_);
+        parameters.addParameter(param::ParameterFactory::declareText("algorithm", "generic"), algorithm_);
         parameters.addParameter(param::ParameterFactory::declareText("planner_topic", "plan_path"), channel_);
 
         parameters.addParameter(param::ParameterFactory::declareRange("min_distance", 0.0, 10.0, 2.0, 0.01), min_dist_);
 
-        parameters.addParameter(param::ParameterFactory::declareBool("grow_obstacles", true), grow_obstacles_);
-        parameters.addConditionalParameter(param::ParameterFactory::declareRange("grow_obstacles/radius", 0.0, 10.0, 1.0, 0.01), grow_obstacles_, obstacle_growth_);
+        parameters.addParameter<decltype(options_.grow_obstacles),bool>(param::ParameterFactory::declareBool
+                                                                        ("grow_obstacles", true), options_.grow_obstacles);
+        parameters.addConditionalParameter<decltype(options_.obstacle_growth_radius),double>(param::ParameterFactory::declareRange(
+                                                                                 "grow_obstacles/radius", 0.0, 10.0, 1.0, 0.01),
+                                                                                 [this]() -> bool {
+                                                                                     return options_.grow_obstacles;
+                                                                                 }, options_.obstacle_growth_radius);
 
-        parameters.addParameter(param::ParameterFactory::declareRange("max_search_duration", 0.0, 30.0, 10.0, 0.01), max_search_duration_);
+        parameters.addParameter<decltype(options_.max_search_duration),double>(param::ParameterFactory::declareRange(
+                                                                                       "max_search_duration", 0.0, 30.0, 10.0, 0.01),
+                                                                                   options_.max_search_duration);
+
+
+        auto cond_generic = [this](){
+            return algorithm_ == "generic";
+        };
+
+        parameters.addConditionalParameter<decltype(options_.reversed),bool>(
+                    param::ParameterFactory::declareValue("planner/reversed", true),
+                    cond_generic, options_.reversed);
+        parameters.addConditionalParameter<decltype(options_.goal_dist_threshold),double>(
+                    param::ParameterFactory::declareValue("planner/goal_dist_threshold", 0.15),
+                    cond_generic, options_.goal_dist_threshold);
+        parameters.addConditionalParameter<decltype(options_.goal_angle_threshold_degree),double>(
+                    param::ParameterFactory::declareValue("planner/goal_angle_threshold", 25.0),
+                    cond_generic, options_.goal_angle_threshold_degree);
+        parameters.addConditionalParameter<decltype(options_.allow_forward),bool>(
+                    param::ParameterFactory::declareValue("planner/allow_forward", true),
+                    cond_generic, options_.allow_forward);
+        parameters.addConditionalParameter<decltype(options_.allow_backward),bool>(
+                    param::ParameterFactory::declareValue("planner/allow_backward", false),
+                    cond_generic, options_.allow_backward);
+        parameters.addConditionalParameter<decltype(options_.ackermann_la),double>(
+                    param::ParameterFactory::declareValue("planner/ackermann_la", 1.2),
+                    cond_generic, options_.ackermann_la);
+        parameters.addConditionalParameter<decltype(options_.ackermann_steer_steps),int>(
+                    param::ParameterFactory::declareValue("planner/ackermann_steer_steps", 2),
+                    cond_generic, options_.ackermann_steer_steps);
+        parameters.addConditionalParameter<decltype(options_.ackermann_max_steer_angle_degree),double>(
+                    param::ParameterFactory::declareValue("planner/ackermann_max_steer_angle", 40.0),
+                    cond_generic, options_.ackermann_max_steer_angle_degree);
+        parameters.addConditionalParameter<decltype(options_.ackermann_steer_delta_degree),double>(
+                    param::ParameterFactory::declareValue("planner/ackermann_steer_delta", 20.0),
+                    cond_generic, options_.ackermann_steer_delta_degree);
 
         parameters.addParameter(param::ParameterFactory::declareOutputText("feedback"));
     }
@@ -127,12 +163,7 @@ public:
         goal.goal.planning_algorithm.data = algorithm_;
         goal.goal.planning_channel.data = channel_;
 
-        goal.goal.grow_obstacles = grow_obstacles_;
-        if(grow_obstacles_) {
-            goal.goal.obstacle_growth_radius = obstacle_growth_;
-        }
-
-        goal.goal.max_search_duration = max_search_duration_;
+        goal.options = options_;
 
         if(start_) {
             goal.use_start = true;
@@ -150,6 +181,8 @@ private:
 
     Output* out_path_;
 
+    path_msgs::PlannerOptions options_;
+
     TransformMessage::ConstPtr start_;
     std::shared_ptr<nav_msgs::OccupancyGrid const> goal_;
 
@@ -157,11 +190,6 @@ private:
     std::string channel_;
 
     double min_dist_;
-
-    bool grow_obstacles_;
-    double obstacle_growth_;
-
-    double max_search_duration_;
 };
 
 }
