@@ -32,8 +32,8 @@ public:
         ChanneledActionlibNode<path_msgs::FollowPathAction>::setupParameters(parameters);
 
         std::map<std::string, int> init_modes = {
-            {"STOP", (int) path_msgs::FollowPathGoal::INIT_MODE_STOP},
-            {"CONTINUE", (int) path_msgs::FollowPathGoal::INIT_MODE_CONTINUE}
+            {"STOP", (int) path_msgs::FollowerOptions::INIT_MODE_STOP},
+            {"CONTINUE", (int) path_msgs::FollowerOptions::INIT_MODE_CONTINUE}
         };
         parameters.addParameter(param::ParameterFactory::declareParameterSet("init_mode", init_modes, 0), init_mode_);
 
@@ -89,8 +89,8 @@ public:
         std::shared_ptr<path_msgs::PathSequence const> path = msg::getMessage<path_msgs::PathSequence>(in_path_);
         apex_assert(path);
 
-        goal.init_mode = init_mode_;
-        goal.velocity = velocity_;
+        goal.follower_options.init_mode = init_mode_;
+        goal.follower_options.velocity = velocity_;
         goal.path = *path;
         goal.robot_controller.data = controller_;
         goal.local_planner.data = local_planner_;
