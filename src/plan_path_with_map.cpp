@@ -86,7 +86,7 @@ public:
 
     void setup(csapex::NodeModifier& modifier) override
     {
-        ActionlibNode<path_msgs::PlanPathAction>::setupROS();
+        ActionlibNode<path_msgs::PlanPathAction>::setup(modifier);
 
         in_goal_ = modifier.addInput<nav_msgs::OccupancyGrid>("Goal");
         in_pose_ = modifier.addOptionalInput<TransformMessage>("Start");

@@ -32,8 +32,8 @@ public:
     void setupParameters(csapex::Parameterizable& parameters) override
     {
         std::map<std::string, int> init_modes = {
-            {"STOP", (int) path_msgs::NavigateToGoalGoal::INIT_MODE_STOP},
-            {"CONTINUE", (int) path_msgs::NavigateToGoalGoal::INIT_MODE_CONTINUE}
+            {"STOP", (int) path_msgs::FollowerOptions::INIT_MODE_STOP},
+            {"CONTINUE", (int) path_msgs::FollowerOptions::INIT_MODE_CONTINUE}
         };
         parameters.addParameter(param::ParameterFactory::declareParameterSet("init_mode", init_modes, 0), init_mode_);
 
@@ -80,10 +80,10 @@ public:
             goal_msg.goal.following_algorithm.data = following_algorithm_;
             goal_msg.goal.planning_channel.data = planning_channel_;
 
-            goal_msg.init_mode = init_mode_;
-            goal_msg.failure_mode = failure_mode_;
+            goal_msg.follower_options.init_mode = init_mode_;
+            goal_msg.follower_options.velocity = 0.5;
 
-            goal_msg.velocity = 0.5;
+            goal_msg.failure_mode = failure_mode_;
 
             ainfo << "sending goal " << goal_msg << std::endl;
             sendGoal(goal_msg);
