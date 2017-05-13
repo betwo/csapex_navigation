@@ -43,10 +43,14 @@ public:
         };
         parameters.addParameter(param::ParameterFactory::declareParameterSet("failure_mode", failure_modes, 0), failure_mode_);
 
-        parameters.addParameter(param::ParameterFactory::declareText("algorithm", "patsy_forward"), planning_algorithm_);
-        parameters.addParameter(param::ParameterFactory::declareText("channel", "plan_path"), planning_channel_);
+        parameters.addParameter(param::ParameterFactory::declareText("planner/algorithm", "gneric"), planning_algorithm_);
+        parameters.addParameter(param::ParameterFactory::declareText("planner/topic", "plan_path"), planning_channel_);
 
-        parameters.addParameter(param::ParameterFactory::declareText("following_algorithm", ""), following_algorithm_);
+
+        parameters.addParameter(param::ParameterFactory::declareText("follower/topic", "follow_path"), following_channel_);
+        parameters.addParameter(param::ParameterFactory::declareText("follower/robot_controller", ""), controller_);
+        parameters.addParameter(param::ParameterFactory::declareText("follower/local_planner", ""), local_planner_);
+        parameters.addParameter(param::ParameterFactory::declareText("follower/collision_avoider", ""), collision_avoider_);
     }
 
     void setup(csapex::NodeModifier& modifier) override
@@ -77,11 +81,13 @@ public:
             goal_msg.goal.pose.header.frame_id = goal_->frame_id;
             goal_msg.goal.pose.header.stamp.fromNSec(goal_->stamp_micro_seconds * 1e3);
             goal_msg.goal.planning_algorithm.data = planning_algorithm_;
-            goal_msg.goal.following_algorithm.data = following_algorithm_;
             goal_msg.goal.planning_channel.data = planning_channel_;
 
             goal_msg.follower_options.init_mode = init_mode_;
             goal_msg.follower_options.velocity = 0.5;
+            goal_msg.follower_options.robot_controller.data = controller_;
+            goal_msg.follower_options.local_planner.data = local_planner_;
+            goal_msg.follower_options.collision_avoider.data = collision_avoider_;
 
             goal_msg.failure_mode = failure_mode_;
 
@@ -125,7 +131,11 @@ private:
 
     std::string planning_algorithm_;
     std::string planning_channel_;
-    std::string following_algorithm_;
+
+    std::string following_channel_;
+    std::string controller_;
+    std::string local_planner_;
+    std::string collision_avoider_;
 
     int init_mode_;
     int failure_mode_;
