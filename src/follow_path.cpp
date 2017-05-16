@@ -89,12 +89,13 @@ public:
         std::shared_ptr<path_msgs::PathSequence const> path = msg::getMessage<path_msgs::PathSequence>(in_path_);
         apex_assert(path);
 
+        goal.path = *path;
+
         goal.follower_options.init_mode = init_mode_;
         goal.follower_options.velocity = velocity_;
-        goal.path = *path;
-        goal.robot_controller.data = controller_;
-        goal.local_planner.data = local_planner_;
-        goal.collision_avoider.data = collision_avoider_;
+        goal.follower_options.robot_controller.data = controller_;
+        goal.follower_options.local_planner.data = local_planner_;
+        goal.follower_options.collision_avoider.data = collision_avoider_;
     }
 
 
