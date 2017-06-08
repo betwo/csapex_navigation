@@ -49,9 +49,16 @@ public:
                                                                                    options_.max_search_duration);
 
 
+        parameters.addParameter(param::ParameterFactory::declareRange("planner/map_search_min_value", 0, 255, 100, 1),
+                                map_search_min_value_);
+        parameters.addParameter(param::ParameterFactory::declareRange("planner/map_search_min_candidates", 1, 256, 64, 1),
+                                map_search_min_candidates_);
+
         auto cond_generic = [this](){
             return algorithm_ == "generic";
         };
+
+
 
         parameters.addConditionalParameter<decltype(options_.reversed),bool>(
                     param::ParameterFactory::declareValue("planner/reversed", true),
@@ -162,6 +169,8 @@ public:
         goal.goal.pose.header = goal_->header;
         goal.goal.planning_algorithm.data = algorithm_;
         goal.goal.planning_channel.data = channel_;
+        goal.goal.map_search_min_value = map_search_min_value_;
+        goal.goal.map_search_min_candidates = map_search_min_candidates_;
 
         goal.options = options_;
 
@@ -190,6 +199,8 @@ private:
     std::string channel_;
 
     double min_dist_;
+    int map_search_min_value_;
+    int map_search_min_candidates_;
 };
 
 }
