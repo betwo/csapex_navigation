@@ -12,9 +12,6 @@
 /// PROJECT
 #include <path_msgs/FollowPathAction.h>
 
-/// SYSTEM
-#include <tf/tf.h>
-
 using namespace csapex::connection_types;
 
 namespace csapex

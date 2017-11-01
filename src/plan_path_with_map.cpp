@@ -13,7 +13,9 @@
 #include <path_msgs/PlanPathAction.h>
 
 /// SYSTEM
-#include <tf/tf.h>
+#include <csapex/utility/suppress_warnings_start.h>
+    #include <tf/tf.h>
+#include <csapex/utility/suppress_warnings_end.h>
 
 using namespace csapex::connection_types;
 

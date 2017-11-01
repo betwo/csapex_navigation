@@ -14,7 +14,9 @@
 #include <csapex/model/node_handle.h>
 
 /// SYSTEM
-#include <tf/tf.h>
+#include <csapex/utility/suppress_warnings_start.h>
+    #include <tf/tf.h>
+#include <csapex/utility/suppress_warnings_end.h>
 #include <geometry_msgs/Twist.h>
 #include <visualization_msgs/MarkerArray.h>
 
