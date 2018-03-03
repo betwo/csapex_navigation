@@ -62,7 +62,7 @@ public:
         event_at_goal_ = modifier.addEvent("at goal");
         event_error_ = modifier.addEvent("error");
 
-        modifier.addTypedSlot<TransformMessage>("goto", [this](const TokenPtr& token) {
+        modifier.addSlot<TransformMessage>("goto", [this](const TokenPtr& token) {
             if(cmd_sent_ || token->getActivityModifier() != ActivityModifier::ACTIVATE) {
                 return;
             }

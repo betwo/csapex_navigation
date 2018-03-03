@@ -47,7 +47,7 @@ public:
         event_at_goal_ = modifier.addEvent("at goal");
         event_error_ = modifier.addEvent("error");
 
-        modifier.addTypedSlot<TransformMessage>("odom pose", [this](const TokenPtr& token) {
+        modifier.addSlot<TransformMessage>("odom pose", [this](const TokenPtr& token) {
             TransformMessage::ConstPtr new_goal_ = std::dynamic_pointer_cast<TransformMessage const>(token->getTokenData());
             apex_assert(new_goal_);
 
