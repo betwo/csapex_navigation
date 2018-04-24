@@ -22,7 +22,7 @@ public:
     {
     }
 
-    void init(CsApexCore& core)
+    void prepare(Settings&) override
     {
         connection_types::MessageConversionHook<connection_types::GenericPointerMessage, nav_msgs::OccupancyGrid>::registerConversion();
         connection_types::MessageConversionHook<connection_types::GenericPointerMessage, path_msgs::DirectionalPath>::registerConversion();
