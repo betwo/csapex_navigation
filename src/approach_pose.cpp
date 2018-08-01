@@ -75,20 +75,20 @@ public:
 
     void setupParameters(csapex::Parameterizable& parameters) override
     {
-        parameters.addParameter(param::ParameterFactory::declareRange("distance", -2.0, 2.0, 0.0, 0.01), distance_);
+        parameters.addParameter(param::factory::declareRange("distance", -2.0, 2.0, 0.0, 0.01), distance_);
 
-        parameters.addParameter(param::ParameterFactory::declareRange("min_distance_to_robot", 0.1, 1.0, 0.4, 0.01), min_distance_to_robot_);
-        parameters.addParameter(param::ParameterFactory::declareRange("min_distance", 0.0, 3.0, 1.5, 0.01), min_offset_distance_);
+        parameters.addParameter(param::factory::declareRange("min_distance_to_robot", 0.1, 1.0, 0.4, 0.01), min_distance_to_robot_);
+        parameters.addParameter(param::factory::declareRange("min_distance", 0.0, 3.0, 1.5, 0.01), min_offset_distance_);
 
-        parameters.addParameter(param::ParameterFactory::declareRange("speed/min", 0.0, 1.0, 0.15, 0.01), min_speed_);
-        parameters.addParameter(param::ParameterFactory::declareRange("speed/max", 0.0, 1.0, 0.3, 0.01), max_speed_);
+        parameters.addParameter(param::factory::declareRange("speed/min", 0.0, 1.0, 0.15, 0.01), min_speed_);
+        parameters.addParameter(param::factory::declareRange("speed/max", 0.0, 1.0, 0.3, 0.01), max_speed_);
 
-        parameters.addParameter(param::ParameterFactory::declareRange("allowed_variation", 0.0, 1.0, 0.5, 0.01), allowed_variation_);
+        parameters.addParameter(param::factory::declareRange("allowed_variation", 0.0, 1.0, 0.5, 0.01), allowed_variation_);
 
-        parameters.addParameter(param::ParameterFactory::declareRange("error/okay", 0.0, 1.0, 0.07, 0.01), error_okay_);
-        parameters.addParameter(param::ParameterFactory::declareRange("error/max", 0.0, 1.0, 0.15, 0.01), error_max_);
+        parameters.addParameter(param::factory::declareRange("error/okay", 0.0, 1.0, 0.07, 0.01), error_okay_);
+        parameters.addParameter(param::factory::declareRange("error/max", 0.0, 1.0, 0.15, 0.01), error_max_);
 
-        parameters.addParameter(param::ParameterFactory::declareRange("steer/max", 0.0, M_PI/2, M_PI/8, 0.001), max_psi_);
+        parameters.addParameter(param::factory::declareRange("steer/max", 0.0, M_PI/2, M_PI/8, 0.001), max_psi_);
     }
 
     void process()

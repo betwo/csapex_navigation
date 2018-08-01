@@ -37,22 +37,22 @@ public:
             {"STOP", (int) path_msgs::FollowerOptions::INIT_MODE_STOP},
             {"CONTINUE", (int) path_msgs::FollowerOptions::INIT_MODE_CONTINUE}
         };
-        parameters.addParameter(param::ParameterFactory::declareParameterSet("init_mode", init_modes, 0), init_mode_);
+        parameters.addParameter(param::factory::declareParameterSet("init_mode", init_modes, 0), init_mode_);
 
         std::map<std::string, int> failure_modes = {
             {"ABORT", (int) path_msgs::NavigateToGoalGoal::FAILURE_MODE_ABORT},
             {"REPLAN", (int) path_msgs::NavigateToGoalGoal::FAILURE_MODE_REPLAN}
         };
-        parameters.addParameter(param::ParameterFactory::declareParameterSet("failure_mode", failure_modes, 0), failure_mode_);
+        parameters.addParameter(param::factory::declareParameterSet("failure_mode", failure_modes, 0), failure_mode_);
 
-        parameters.addParameter(param::ParameterFactory::declareText("planner/algorithm", "gneric"), planning_algorithm_);
-        parameters.addParameter(param::ParameterFactory::declareText("planner/topic", "plan_path"), planning_channel_);
+        parameters.addParameter(param::factory::declareText("planner/algorithm", "gneric"), planning_algorithm_);
+        parameters.addParameter(param::factory::declareText("planner/topic", "plan_path"), planning_channel_);
 
 
-        parameters.addParameter(param::ParameterFactory::declareText("follower/topic", "follow_path"), following_channel_);
-        parameters.addParameter(param::ParameterFactory::declareText("follower/robot_controller", ""), controller_);
-        parameters.addParameter(param::ParameterFactory::declareText("follower/local_planner", ""), local_planner_);
-        parameters.addParameter(param::ParameterFactory::declareText("follower/collision_avoider", ""), collision_avoider_);
+        parameters.addParameter(param::factory::declareText("follower/topic", "follow_path"), following_channel_);
+        parameters.addParameter(param::factory::declareText("follower/robot_controller", ""), controller_);
+        parameters.addParameter(param::factory::declareText("follower/local_planner", ""), local_planner_);
+        parameters.addParameter(param::factory::declareText("follower/collision_avoider", ""), collision_avoider_);
     }
 
     void setup(csapex::NodeModifier& modifier) override

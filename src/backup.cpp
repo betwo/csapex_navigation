@@ -58,10 +58,10 @@ public:
 
     void setupParameters(csapex::Parameterizable& parameters) override
     {
-        parameters.addParameter(param::ParameterFactory::declareRange("distance", -5.0, 5.0, 0.0, 0.01), distance_);
+        parameters.addParameter(param::factory::declareRange("distance", -5.0, 5.0, 0.0, 0.01), distance_);
 
-        parameters.addParameter(param::ParameterFactory::declareRange("speed/min", 0.0, 1.0, 0.15, 0.01), min_speed_);
-        parameters.addParameter(param::ParameterFactory::declareRange("speed/max", 0.0, 1.0, 0.3, 0.01), max_speed_);
+        parameters.addParameter(param::factory::declareRange("speed/min", 0.0, 1.0, 0.15, 0.01), min_speed_);
+        parameters.addParameter(param::factory::declareRange("speed/max", 0.0, 1.0, 0.3, 0.01), max_speed_);
     }
 
     void process()

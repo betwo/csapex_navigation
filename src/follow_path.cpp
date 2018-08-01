@@ -32,15 +32,15 @@ public:
             {"STOP", (int) path_msgs::FollowerOptions::INIT_MODE_STOP},
             {"CONTINUE", (int) path_msgs::FollowerOptions::INIT_MODE_CONTINUE}
         };
-        parameters.addParameter(param::ParameterFactory::declareParameterSet("init_mode", init_modes, 0), init_mode_);
+        parameters.addParameter(param::factory::declareParameterSet("init_mode", init_modes, 0), init_mode_);
 
-        parameters.addParameter(param::ParameterFactory::declareRange("target_velocity", 0.0, 5.0, 1.0, 0.01), velocity_);
+        parameters.addParameter(param::factory::declareRange("target_velocity", 0.0, 5.0, 1.0, 0.01), velocity_);
 
-        parameters.addParameter(param::ParameterFactory::declareText("follower_topic", "follow_path"), channel_);
+        parameters.addParameter(param::factory::declareText("follower_topic", "follow_path"), channel_);
 
-        parameters.addParameter(param::ParameterFactory::declareText("robot_controller", ""), controller_);
-        parameters.addParameter(param::ParameterFactory::declareText("local_planner", ""), local_planner_);
-        parameters.addParameter(param::ParameterFactory::declareText("collision_avoider", ""), collision_avoider_);
+        parameters.addParameter(param::factory::declareText("robot_controller", ""), controller_);
+        parameters.addParameter(param::factory::declareText("local_planner", ""), local_planner_);
+        parameters.addParameter(param::factory::declareText("collision_avoider", ""), collision_avoider_);
     }
 
     void setup(csapex::NodeModifier& modifier) override

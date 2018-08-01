@@ -79,32 +79,32 @@ public:
 
     void setupParameters(csapex::Parameterizable& parameters) override
     {
-        parameters.addParameter(param::ParameterFactory::declareRange("distance", -2.0, 2.0, 0.0, 0.01), distance_);
+        parameters.addParameter(param::factory::declareRange("distance", -2.0, 2.0, 0.0, 0.01), distance_);
 
-        parameters.addParameter(param::ParameterFactory::declareRange("trailer/length", 0.0, 2.0, 1.2, 0.01), trailer_length_);
+        parameters.addParameter(param::factory::declareRange("trailer/length", 0.0, 2.0, 1.2, 0.01), trailer_length_);
 
-        parameters.addParameter(param::ParameterFactory::declareRange("min_distance_to_robot", 0.1, 1.0, 0.8, 0.01), min_distance_to_robot_);
-        parameters.addParameter(param::ParameterFactory::declareRange("min_distance", 0.0, 3.0, 2.0, 0.01), min_offset_distance_);
+        parameters.addParameter(param::factory::declareRange("min_distance_to_robot", 0.1, 1.0, 0.8, 0.01), min_distance_to_robot_);
+        parameters.addParameter(param::factory::declareRange("min_distance", 0.0, 3.0, 2.0, 0.01), min_offset_distance_);
 
-        parameters.addParameter(param::ParameterFactory::declareRange("speed/min", 0.0, 1.0, 0.15, 0.01), min_speed_);
-        parameters.addParameter(param::ParameterFactory::declareRange("speed/max", 0.0, 1.0, 0.3, 0.01), max_speed_);
+        parameters.addParameter(param::factory::declareRange("speed/min", 0.0, 1.0, 0.15, 0.01), min_speed_);
+        parameters.addParameter(param::factory::declareRange("speed/max", 0.0, 1.0, 0.3, 0.01), max_speed_);
 
-        parameters.addParameter(param::ParameterFactory::declareRange("error/okay", 0.0, 1.0, 0.06, 0.01), error_okay_);
-        parameters.addParameter(param::ParameterFactory::declareRange("error/max", 0.0, 1.0, 0.16, 0.01), error_max_);
+        parameters.addParameter(param::factory::declareRange("error/okay", 0.0, 1.0, 0.06, 0.01), error_okay_);
+        parameters.addParameter(param::factory::declareRange("error/max", 0.0, 1.0, 0.16, 0.01), error_max_);
 
-        parameters.addParameter(param::ParameterFactory::declareRange("allowed_variation", 0.0, 1.0, 0.5, 0.01), allowed_variation_);
+        parameters.addParameter(param::factory::declareRange("allowed_variation", 0.0, 1.0, 0.5, 0.01), allowed_variation_);
 
-        parameters.addParameter(param::ParameterFactory::declareRange("steer/max", 0.0, M_PI/2, M_PI/2, 0.001), max_psi_);
+        parameters.addParameter(param::factory::declareRange("steer/max", 0.0, M_PI/2, M_PI/2, 0.001), max_psi_);
 
-        parameters.addParameter(param::ParameterFactory::declareRange("steer/p", 0.0, 2.0, 0.93, 0.001),
+        parameters.addParameter(param::factory::declareRange("steer/p", 0.0, 2.0, 0.93, 0.001),
                                 [this](param::Parameter* p) {
             pid_psi_.setKP(p->as<double>());
         });
-        parameters.addParameter(param::ParameterFactory::declareRange("steer/i", 0.0, 1.0, 0.2, 0.0001),
+        parameters.addParameter(param::factory::declareRange("steer/i", 0.0, 1.0, 0.2, 0.0001),
                                 [this](param::Parameter* p) {
             pid_psi_.setKI(p->as<double>());
         });
-        parameters.addParameter(param::ParameterFactory::declareRange("steer/d", 0.0, 1.0, 0.1, 0.0001),
+        parameters.addParameter(param::factory::declareRange("steer/d", 0.0, 1.0, 0.1, 0.0001),
                                 [this](param::Parameter* p) {
             pid_psi_.setKD(p->as<double>());
         });
