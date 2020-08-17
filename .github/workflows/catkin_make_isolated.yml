@@ -1,0 +1,134 @@
+name: catkin_make_isolated
+
+on: [push]
+
+jobs:
+  build-18-melodic:
+    runs-on: [ubuntu-18.04]
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: ["-DCMAKE_BUILD_TYPE=Debug", "-DCMAKE_BUILD_TYPE=Release"]
+        compiler: ["-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++", "-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++"]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: betwo/csapex
+        path: src/csapex
+    - uses: actions/checkout@v2
+      with:
+        repository: betwo/csapex_core_plugins
+        path: src/csapex_core_plugins
+    - uses: actions/checkout@v2
+      with:
+        repository: cogsys-tuebingen/gerona
+        path: src/gerona
+    - uses: actions/checkout@v2
+      with:
+        repository: cogsys-tuebingen/cslibs_path_planning
+        path: src/cslibs_path_planning
+    - uses: actions/checkout@v2
+      with:
+        repository: cogsys-tuebingen/cslibs_vision
+        path: src/cslibs_vision
+    - uses: actions/checkout@v2
+      with:
+        repository: cogsys-tuebingen/cslibs_arff
+        path: src/cslibs_arff
+    - uses: actions/checkout@v2
+      with:
+        repository: cogsys-tuebingen/cslibs_laser_processing
+        path: src/cslibs_laser_processing
+    - uses: actions/checkout@v2
+      with:
+        repository: cogsys-tuebingen/cslibs_indexed_storage
+        path: src/cslibs_indexed_storage
+    - uses: actions/checkout@v2
+      with:
+        repository: cogsys-tuebingen/cslibs_navigation_utilities
+        path: src/cslibs_navigation_utilities
+    - uses: actions/checkout@v2
+      with:
+        repository: sbpl/sbpl
+        path: src/sbpl
+    - uses: actions/checkout@v2
+      with:
+        path: src/csapex/src/csapex_plugins/
+    - name: clone_dependencies
+      run: |
+        find $HOME/work
+    - uses: betwo/github-setup-catkin@v1.1.1
+      with:
+        ros-version: 'melodic'
+        workspace: $HOME/work/csapex_navigation/csapex_navigation
+    - name: install_compiler
+      run: sudo apt-get install -y gcc clang
+    - name: build
+      run: |
+        cd $HOME/work/csapex_navigation/csapex_navigation
+        catkin_make_isolated ${{ matrix.build_type }} ${{ matrix.compiler }} --install --only-pkg-with-deps csapex_navigation
+
+  build-20-noetic:
+    runs-on: [ubuntu-20.04]
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: ["-DCMAKE_BUILD_TYPE=Debug", "-DCMAKE_BUILD_TYPE=Release"]
+        compiler: ["-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++", "-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++"]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: betwo/csapex
+        path: src/csapex
+    - uses: actions/checkout@v2
+      with:
+        repository: betwo/csapex_core_plugins
+        path: src/csapex_core_plugins
+    - uses: actions/checkout@v2
+      with:
+        repository: cogsys-tuebingen/gerona
+        path: src/gerona
+    - uses: actions/checkout@v2
+      with:
+        repository: cogsys-tuebingen/cslibs_path_planning
+        path: src/cslibs_path_planning
+    - uses: actions/checkout@v2
+      with:
+        repository: cogsys-tuebingen/cslibs_vision
+        path: src/cslibs_vision
+    - uses: actions/checkout@v2
+      with:
+        repository: cogsys-tuebingen/cslibs_arff
+        path: src/cslibs_arff
+    - uses: actions/checkout@v2
+      with:
+        repository: cogsys-tuebingen/cslibs_laser_processing
+        path: src/cslibs_laser_processing
+    - uses: actions/checkout@v2
+      with:
+        repository: cogsys-tuebingen/cslibs_indexed_storage
+        path: src/cslibs_indexed_storage
+    - uses: actions/checkout@v2
+      with:
+        repository: cogsys-tuebingen/cslibs_navigation_utilities
+        path: src/cslibs_navigation_utilities
+    - uses: actions/checkout@v2
+      with:
+        repository: sbpl/sbpl
+        path: src/sbpl
+    - uses: actions/checkout@v2
+      with:
+        path: src/csapex/src/csapex_plugins/
+    - name: clone_dependencies
+      run: |
+        find $HOME/work
+    - uses: betwo/github-setup-catkin@v1.1.1
+      with:
+        ros-version: 'noetic'
+        workspace: $HOME/work/csapex_navigation/csapex_navigation
+    - name: install_compiler
+      run: sudo apt-get install -y gcc clang
+    - name: build
+      run: |
+        cd $HOME/work/csapex_navigation/csapex_navigation
+        catkin_make_isolated ${{ matrix.build_type }} ${{ matrix.compiler }} --install --only-pkg-with-deps csapex_navigation
