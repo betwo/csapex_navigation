@@ -29,7 +29,7 @@ public:
         connection_types::MessageConversionHook<connection_types::GenericPointerMessage, path_msgs::PathSequence>::registerConversion();
     }
 
-    void shutdown()
+    void shutdown() override
     {
     }
 

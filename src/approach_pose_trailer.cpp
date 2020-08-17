@@ -66,13 +66,13 @@ public:
         node_handle_->setProcessingEnabled(false);
     }
 
-    void activation()
+    void activation() override
     {
         last_error_pos_ = std::numeric_limits<double>::infinity();
         node_handle_->setProcessingEnabled(true);
     }
 
-    void deactivation()
+    void deactivation() override
     {
         node_handle_->setProcessingEnabled(false);
     }
@@ -110,7 +110,7 @@ public:
         });
     }
 
-    void process()
+    void process() override
     {
         if(!goal_) {
             awarn << "no goal set!" << std::endl;

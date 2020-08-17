@@ -62,13 +62,13 @@ public:
         node_handle_->setProcessingEnabled(false);
     }
 
-    void activation()
+    void activation() override
     {
         last_error_pos_ = std::numeric_limits<double>::infinity();
         node_handle_->setProcessingEnabled(true);
     }
 
-    void deactivation()
+    void deactivation() override
     {
         node_handle_->setProcessingEnabled(false);
     }
@@ -91,7 +91,7 @@ public:
         parameters.addParameter(param::factory::declareRange("steer/max", 0.0, M_PI/2, M_PI/8, 0.001), max_psi_);
     }
 
-    void process()
+    void process() override
     {
         if(!goal_) {
             awarn << "no goal set!" << std::endl;

@@ -57,7 +57,7 @@ public:
         parameters.addParameter(param::factory::declareRange("speed/max", 0.0, 1.0, 0.3, 0.01), max_speed_);
     }
 
-    void process()
+    void process() override
     {
         pose_ = msg::getMessage<TransformMessage>(in_pose_);
 

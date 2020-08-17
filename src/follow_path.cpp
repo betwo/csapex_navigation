@@ -76,12 +76,12 @@ public:
 
     }
 
-    virtual std::string getChannel() const
+    virtual std::string getChannel() const override
     {
         return channel_;
     }
 
-    void getGoal(path_msgs::FollowPathGoal& goal)
+    void getGoal(path_msgs::FollowPathGoal& goal) override
     {
         std::shared_ptr<path_msgs::PathSequence const> path = msg::getMessage<path_msgs::PathSequence>(in_path_);
         apex_assert(path);

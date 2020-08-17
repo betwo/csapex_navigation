@@ -90,7 +90,7 @@ public:
         out_path_ = modifier.addOutput<path_msgs::PathSequence>("Path");
     }
 
-    void setupROS()
+    void setupROS() override
     {
         ActionlibNode<path_msgs::PlanPathAction>::setupROS();
 

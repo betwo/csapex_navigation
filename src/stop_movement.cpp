@@ -23,7 +23,7 @@ public:
 
     void setup(csapex::NodeModifier& modifier) override
     {
-        slot_ = modifier.addSlot("stop", [this]() {
+        slot_ = modifier.addSlot("stop", []() {
         });
     }
 

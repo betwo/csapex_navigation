@@ -118,7 +118,7 @@ public:
         }
     }
 
-    void feedbackCallback(const path_msgs::PlanPathFeedbackConstPtr& fb)
+    void feedbackCallback(const path_msgs::PlanPathFeedbackConstPtr& fb) override
     {
         std::string msg;
         switch(fb->status) {

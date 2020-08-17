@@ -100,21 +100,21 @@ public:
         });
     }
 
-    void setupROS()
+    void setupROS() override
     {
         setupClient("navigate_to_goal", true);
     }
 
-    void activation()
+    void activation() override
     {
     }
 
-    void deactivation()
+    void deactivation() override
     {
         cmd_sent_ = false;
     }
 
-    virtual void processResultCallback(const actionlib::SimpleClientGoalState&, const path_msgs::NavigateToGoalResultConstPtr& result)
+    virtual void processResultCallback(const actionlib::SimpleClientGoalState&, const path_msgs::NavigateToGoalResultConstPtr& result) override
     {
         goal_.reset();
 
