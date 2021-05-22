@@ -57,7 +57,7 @@ jobs:
     - name: clone_dependencies
       run: |
         find $HOME/work
-    - uses: betwo/github-setup-catkin@v1.1.1
+    - uses: betwo/github-setup-catkin@master
       with:
         ros-version: 'melodic'
         workspace: $HOME/work/csapex_navigation/csapex_navigation
@@ -122,7 +122,7 @@ jobs:
     - name: clone_dependencies
       run: |
         find $HOME/work
-    - uses: betwo/github-setup-catkin@v1.1.1
+    - uses: betwo/github-setup-catkin@master
       with:
         ros-version: 'noetic'
         workspace: $HOME/work/csapex_navigation/csapex_navigation
